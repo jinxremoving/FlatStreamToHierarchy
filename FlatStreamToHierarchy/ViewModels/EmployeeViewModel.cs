@@ -39,23 +39,21 @@ namespace FlatStreamToHierarchy.ViewModels
             _promoteCommand = new Command(()=>promoteAction(this),()=>Parent.HasValue);
             _sackCommand = new Command(() => sackAction(this));
 
-            //use laxy loading 
+            //Wrap loader for the nested view model inside a lazy so we can control when it is invoked
             var childrenLoader = new Lazy<IDisposable>(() => node.Children.Connect()
                                 .Transform(e => new EmployeeViewModel(e, promoteAction, sackAction,this))
                                 .Bind(Inferiors)
                                 .DisposeMany()
                                 .Subscribe());
+
+            //return true when the children should be loaded 
+            //(i.e. if current node is a root, otherwise when the parent expands)
+            var shouldExpand = node.IsRoot
+                ? Observable.Return(true)
+                : Parent.Value.ObservePropertyValue(This => This.IsExpanded).Value();
             
-            var disposer = new SingleAssignmentDisposable();
-            if (!Parent.HasValue)
-            {
-                //force loading now
-                var x = childrenLoader.Value;
-            }
-            else
-            {
-                //load children when the parent has expanded
-                disposer.Disposable = Parent.Value.ObservePropertyValue(This => This.IsExpanded).Value()
+            //wire the observable
+            var expander =shouldExpand
                     .Where(isExpanded => isExpanded)
                     .Take(1)
                     .Subscribe(_ =>
@@ -63,7 +61,6 @@ namespace FlatStreamToHierarchy.ViewModels
                         //force lazy loading
                         var x = childrenLoader.Value;
                     });
-            }
 
             //create some display text based on the number of employees
             var employeesCount = node.Children.CountChanged
@@ -80,7 +77,7 @@ namespace FlatStreamToHierarchy.ViewModels
 
             _cleanUp = Disposable.Create(() =>
             {
-                disposer.Dispose();
+                expander.Dispose();
                 employeesCount.Dispose();
                 if (childrenLoader.IsValueCreated)
                     childrenLoader.Value.Dispose();

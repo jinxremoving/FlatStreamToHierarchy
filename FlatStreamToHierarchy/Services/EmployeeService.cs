@@ -21,7 +21,7 @@ namespace FlatStreamToHierarchy.Services
 
         public void Promote(EmployeeDto promtedDto, int  newBoss)
         {
-            //simulate going to a service
+            //in the real world, go to service then updated the cache
 
             //update the cache with the emploee, 
             _employees.AddOrUpdate(new EmployeeDto(promtedDto.Id,promtedDto.Name,newBoss));
@@ -30,6 +30,8 @@ namespace FlatStreamToHierarchy.Services
 
         public void Sack(EmployeeDto sackEmp)
         {
+            //in the real world, go to service then updated the cache
+
             _employees.BatchUpdate(updater =>
             {
                 //assign new boss to the workers of the sacked employee
