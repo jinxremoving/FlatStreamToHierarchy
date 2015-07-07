@@ -14,6 +14,9 @@ var loader =  employeeService.Employees.Connect()
     .DisposeMany()
     .Subscribe(); 
 ``` 
- produces this
+
+together with some view model and xaml magic produces this
  
-![Observable tree example](https://github.com/RolandPheasant/TradingDemo/blob/master/Images/LiveTrades.gif "Live Trades View")
+![Observable tree example](https://github.com/RolandPheasant/FlatStreamToHierarchy/blob/master/FlatStreamToHierarchy/Screenshot.gif "Observable Tree View")
+
+
