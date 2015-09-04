@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using DynamicData;
-using DynamicData.Binding;
 using FlatStreamToHierarchy.Services;
 
 namespace FlatStreamToHierarchy.ViewModels
@@ -8,7 +8,7 @@ namespace FlatStreamToHierarchy.ViewModels
     public class EmployeesViewModel : IDisposable
     {
         private readonly EmployeeService _employeeService;
-        private readonly IObservableCollection<EmployeeViewModel> _employeeViewModels = new ObservableCollectionExtended<EmployeeViewModel>();
+        private readonly ReadOnlyObservableCollection<EmployeeViewModel> _employeeViewModels;
         private readonly IDisposable _cleanUp;
 
         public EmployeesViewModel(EmployeeService employeeService)
@@ -20,7 +20,7 @@ namespace FlatStreamToHierarchy.ViewModels
             _cleanUp =  employeeService.Employees.Connect()
                 .TransformToTree(employee => employee.BossId)
                 .Transform(node => new EmployeeViewModel(node, Promote,Sack))
-                .Bind(_employeeViewModels)
+                .Bind(out _employeeViewModels)
                 .DisposeMany()
                 .Subscribe();    
         }
@@ -36,7 +36,7 @@ namespace FlatStreamToHierarchy.ViewModels
             _employeeService.Sack(viewModel.Dto);
         }
 
-        public IObservableCollection<EmployeeViewModel> EmployeeViewModels
+        public ReadOnlyObservableCollection<EmployeeViewModel> EmployeeViewModels
         {
             get { return _employeeViewModels; }
         }

@@ -21,7 +21,7 @@ namespace FlatStreamToHierarchy.Services
 
         public void Promote(EmployeeDto promtedDto, int  newBoss)
         {
-            //in the real world, go to service then updated the cache
+            //in the real world, go to service then update the cache
 
             //update the cache with the emploee, 
             _employees.AddOrUpdate(new EmployeeDto(promtedDto.Id,promtedDto.Name,newBoss));

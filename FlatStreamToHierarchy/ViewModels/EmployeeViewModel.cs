@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -22,13 +23,12 @@ namespace FlatStreamToHierarchy.ViewModels
         private readonly int _bossId;
         private readonly EmployeeDto _dto;
         private readonly Optional<EmployeeViewModel> _parent;
-        private readonly IObservableCollection<EmployeeViewModel> _inferiors;
+        private  ReadOnlyObservableCollection<EmployeeViewModel> _inferiors;
         private readonly int _id;
         private readonly string _name;
 
         public EmployeeViewModel(Node<EmployeeDto, int> node, Action<EmployeeViewModel> promoteAction, Action<EmployeeViewModel> sackAction, EmployeeViewModel parent = null)
         {
-            _inferiors = new ObservableCollectionExtended<EmployeeViewModel>();
             _id = node.Key;
             _name = node.Item.Name;
             _depth = node.Depth;
@@ -41,8 +41,8 @@ namespace FlatStreamToHierarchy.ViewModels
 
             //Wrap loader for the nested view model inside a lazy so we can control when it is invoked
             var childrenLoader = new Lazy<IDisposable>(() => node.Children.Connect()
-                                .Transform(e => new EmployeeViewModel(e, promoteAction, sackAction,this))
-                                .Bind(Inferiors)
+                                .Transform(e => new EmployeeViewModel(e, promoteAction, sackAction, this))
+                                .Bind(out _inferiors)
                                 .DisposeMany()
                                 .Subscribe());
 
@@ -50,7 +50,7 @@ namespace FlatStreamToHierarchy.ViewModels
             //(i.e. if current node is a root, otherwise when the parent expands)
             var shouldExpand = node.IsRoot
                 ? Observable.Return(true)
-                : Parent.Value.ObservePropertyValue(This => This.IsExpanded).Value();
+                : Parent.Value.WhenValueChanged(This => This.IsExpanded);
             
             //wire the observable
             var expander =shouldExpand
@@ -114,7 +114,7 @@ namespace FlatStreamToHierarchy.ViewModels
             get { return _parent; }
         }
 
-        public IObservableCollection<EmployeeViewModel> Inferiors
+        public ReadOnlyObservableCollection<EmployeeViewModel> Inferiors
         {
             get { return _inferiors; }
         }

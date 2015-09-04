@@ -37,3 +37,4 @@ _ReSharper*/
 /Dynamic.Trader.sln.GhostDoc.xml
 /FlatStreamToHierarchy.sln.GhostDoc.xml
 /perl.exe.stackdump
+*.stackdump
