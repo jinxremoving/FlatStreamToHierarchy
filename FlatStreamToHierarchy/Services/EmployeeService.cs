@@ -14,10 +14,7 @@ namespace FlatStreamToHierarchy.Services
             _employees.AddOrUpdate(CreateEmployees(25000));
         }
 
-        public IObservableCache<EmployeeDto, int> Employees
-        {
-            get { return _employees.AsObservableCache(); }
-        }
+        public IObservableCache<EmployeeDto, int> Employees => _employees.AsObservableCache();
 
         public void Promote(EmployeeDto promtedDto, int  newBoss)
         {
@@ -32,7 +29,7 @@ namespace FlatStreamToHierarchy.Services
         {
             //in the real world, go to service then updated the cache
 
-            _employees.BatchUpdate(updater =>
+            _employees.Edit(updater =>
             {
                 //assign new boss to the workers of the sacked employee
                 var workersWithNewBoss = updater.Items
@@ -57,7 +54,7 @@ namespace FlatStreamToHierarchy.Services
                 .Select(i =>
                 {
                     var boss = i%1000 == 0 ? 0 : random.Next(0, i);
-                    return new EmployeeDto(i, string.Format("Person {0}",i), boss);
+                    return new EmployeeDto(i, $"Person {i}", boss);
                 });
         }
     }

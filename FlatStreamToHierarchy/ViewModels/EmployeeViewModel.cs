@@ -19,22 +19,16 @@ namespace FlatStreamToHierarchy.ViewModels
         private readonly Command _promoteCommand;
         private readonly Command _sackCommand;
         private string _employeeCountText;
-        private readonly int _depth;
-        private readonly int _bossId;
-        private readonly EmployeeDto _dto;
-        private readonly Optional<EmployeeViewModel> _parent;
         private  ReadOnlyObservableCollection<EmployeeViewModel> _inferiors;
-        private readonly int _id;
-        private readonly string _name;
 
         public EmployeeViewModel(Node<EmployeeDto, int> node, Action<EmployeeViewModel> promoteAction, Action<EmployeeViewModel> sackAction, EmployeeViewModel parent = null)
         {
-            _id = node.Key;
-            _name = node.Item.Name;
-            _depth = node.Depth;
-            _parent = parent;
-            _bossId = node.Item.BossId; 
-            _dto = node.Item;
+            Id = node.Key;
+            Name = node.Item.Name;
+            Depth = node.Depth;
+            Parent = parent;
+            BossId = node.Item.BossId; 
+            Dto = node.Item;
 
             _promoteCommand = new Command(()=>promoteAction(this),()=>Parent.HasValue);
             _sackCommand = new Command(() => sackAction(this));
@@ -71,7 +65,7 @@ namespace FlatStreamToHierarchy.ViewModels
 
                     return count == 1
                        ? "1 person reports to me"
-                       : string.Format("{0} people reports to me", count);
+                       : $"{count} people reports to me";
 
                 }).Subscribe(text => EmployeeCountText = text);
 
@@ -84,67 +78,40 @@ namespace FlatStreamToHierarchy.ViewModels
             });
         }
 
-        public int Id
-        {
-            get { return _id; }
-        }
+        public int Id { get; }
 
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name { get; }
 
-        public int Depth
-        {
-            get { return _depth; }
-        }
+        public int Depth { get; }
 
-        public int BossId
-        {
-            get { return _bossId; }
-        }
+        public int BossId { get; }
 
-        public EmployeeDto Dto
-        {
-            get { return _dto; }
-        }
+        public EmployeeDto Dto { get; }
 
-        public Optional<EmployeeViewModel> Parent
-        {
-            get { return _parent; }
-        }
+        public Optional<EmployeeViewModel> Parent { get; }
 
-        public ReadOnlyObservableCollection<EmployeeViewModel> Inferiors
-        {
-            get { return _inferiors; }
-        }
-        
-        public ICommand PromoteCommand
-        {
-            get { return _promoteCommand; }
-        }
+        public ReadOnlyObservableCollection<EmployeeViewModel> Inferiors => _inferiors;
 
-        public ICommand SackCommand
-        {
-            get { return _sackCommand; }
-        }
+        public ICommand PromoteCommand => _promoteCommand;
+
+        public ICommand SackCommand => _sackCommand;
 
         public string EmployeeCountText
         {
-            get { return _employeeCountText; }
-            set { SetAndRaise(ref _employeeCountText, value); }
+            get => _employeeCountText;
+            set => SetAndRaise(ref _employeeCountText, value);
         }
         
         public bool IsExpanded
         {
-            get { return _isExpanded; }
-            set {SetAndRaise(ref _isExpanded,value); }
+            get => _isExpanded;
+            set => SetAndRaise(ref _isExpanded,value);
         }
 
         public bool IsSelected
         {
-            get { return _isSelected; }
-            set { SetAndRaise(ref _isSelected, value); }
+            get => _isSelected;
+            set => SetAndRaise(ref _isSelected, value);
         }
         
         #region Equality Members

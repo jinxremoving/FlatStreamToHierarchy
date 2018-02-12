@@ -13,8 +13,8 @@ namespace FlatStreamToHierarchy.ViewModels
             Employees = new EmployeesViewModel(new EmployeeService());
         }
 
-        public EmployeesViewModel Employees { get; private set; }
-        public ICommand ShowInGitHubCommand { get; private set; }
+        public EmployeesViewModel Employees { get; }
+        public ICommand ShowInGitHubCommand { get; }
 
     }
 }

@@ -4,31 +4,16 @@ namespace FlatStreamToHierarchy.Services
 {
     public class EmployeeDto : IEquatable<EmployeeDto>
     {
-        private readonly int _id;
-        private readonly int _bossId;
-        private readonly string _name;
-
         public EmployeeDto(int id, string name, int boss)
         {
-            _id = id;
-            _name = name;
-            _bossId = boss;
+            Id = id;
+            Name = name;
+            BossId = boss;
         }
 
-        public int Id
-        {
-            get { return _id; }
-        }
-
-        public int BossId
-        {
-            get { return _bossId; }
-        }
-
-        public string Name
-        {
-            get { return _name; }
-        }
+        public int Id { get; }
+        public int BossId { get; }
+        public string Name { get; }
 
         #region Equality Members
 

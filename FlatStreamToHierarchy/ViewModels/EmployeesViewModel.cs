@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using DynamicData;
 using FlatStreamToHierarchy.Services;
 
@@ -15,14 +16,16 @@ namespace FlatStreamToHierarchy.ViewModels
         {
             _employeeService = employeeService;
 
+            bool DefaultPredicate(Node<EmployeeDto, int> node) => node.IsRoot;
+
             //transform the data to a full nested tree
             //then transform into a fully recursive view model
-            _cleanUp =  employeeService.Employees.Connect()
-                .TransformToTree(employee => employee.BossId)
-                .Transform(node => new EmployeeViewModel(node, Promote,Sack))
+            _cleanUp = employeeService.Employees.Connect()
+                .TransformToTree(employee => employee.BossId, Observable.Return((Func<Node<EmployeeDto, int>, bool>) DefaultPredicate))
+                .Transform(node => new EmployeeViewModel(node, Promote, Sack))
                 .Bind(out _employeeViewModels)
                 .DisposeMany()
-                .Subscribe();    
+                .Subscribe();
         }
 
         private void Promote(EmployeeViewModel viewModel)
@@ -36,10 +39,7 @@ namespace FlatStreamToHierarchy.ViewModels
             _employeeService.Sack(viewModel.Dto);
         }
 
-        public ReadOnlyObservableCollection<EmployeeViewModel> EmployeeViewModels
-        {
-            get { return _employeeViewModels; }
-        }
+        public ReadOnlyObservableCollection<EmployeeViewModel> EmployeeViewModels => _employeeViewModels;
 
         public void Dispose()
         {
