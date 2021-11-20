@@ -1,19 +1,39 @@
 ﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace FlatStreamToHierarchy.Services
 {
     public class EmployeeDto : IEquatable<EmployeeDto>
     {
-        public EmployeeDto(int id, string name, int boss)
+        private string status;
+        private readonly ReplaySubject<string> statusSubject = new ReplaySubject<string>(1);
+
+        public EmployeeDto(int id, string name, int boss, string status)
         {
             Id = id;
             Name = name;
             BossId = boss;
+            Status = status;
         }
 
         public int Id { get; }
         public int BossId { get; }
         public string Name { get; }
+        public string Status
+        {
+            get => this.status;
+            set
+            {
+                if (this.status != value)
+                {
+                    this.status = value;
+                    this.statusSubject.OnNext(value);
+                }
+            }
+        }
+
+        public IObservable<string> StatusChanged => this.statusSubject.AsObservable();
 
         #region Equality Members
 

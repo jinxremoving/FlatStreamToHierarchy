@@ -75,6 +75,7 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
@@ -86,6 +87,11 @@
 
                         <TextBlock
                             Grid.Row="1" Grid.Column="0"
+                            FontWeight="Light"
+                            Text="{Binding Status}" />
+
+                        <TextBlock
+                            Grid.Row="2" Grid.Column="0"
                             FontWeight="Light"
                             Text="{Binding EmployeeCountText}" />
 

@@ -25,6 +25,12 @@ namespace FlatStreamToHierarchy.ViewModels
         {
             Id = node.Key;
             Name = node.Item.Name;
+            Status = node.Item.Status;
+            var updateStatus = node.Item.StatusChanged.Subscribe(_ =>
+            {
+                this.Status = node.Item.Status;
+                this.OnPropertyChanged(nameof(Status));
+            });
             Depth = node.Depth;
             Parent = parent;
             BossId = node.Item.BossId; 
@@ -72,6 +78,7 @@ namespace FlatStreamToHierarchy.ViewModels
             _cleanUp = Disposable.Create(() =>
             {
                 expander.Dispose();
+                updateStatus.Dispose();
                 employeesCount.Dispose();
                 if (childrenLoader.IsValueCreated)
                     childrenLoader.Value.Dispose();
@@ -81,6 +88,8 @@ namespace FlatStreamToHierarchy.ViewModels
         public int Id { get; }
 
         public string Name { get; }
+
+        public string Status { get; private set; }
 
         public int Depth { get; }
 
