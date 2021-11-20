@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using DynamicData;
-using DynamicData.Kernel;
+using DynamicData.Binding;
 using FlatStreamToHierarchy.Services;
 
 namespace FlatStreamToHierarchy.ViewModels
@@ -20,12 +20,12 @@ namespace FlatStreamToHierarchy.ViewModels
 
             bool DefaultPredicate(Node<EmployeeDto, int> node) => node.IsRoot;
 
-
             //transform the data to a full nested tree
             //then transform into a fully recursive view model
             _cleanUp = employeeService.Employees.Connect()
                 .TransformToTree(employee => employee.BossId, Observable.Return((Func<Node<EmployeeDto, int>, bool>)DefaultPredicate))
                 .Transform(node => new EmployeeViewModel(node, Promote, Sack))
+                .Sort(SortExpressionComparer<EmployeeViewModel>.Descending(e => e.Name))
                 .Bind(out _employeeViewModels)
                 .DisposeMany()
                 .Subscribe();
